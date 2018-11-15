@@ -15,7 +15,7 @@ while True:
 	if t == ord('q'):
 		break
 	elif t == ord('s'):
-		cv2.imwrite( "PDI_" + str(count) + ".jpg", imagem );
+		cv2.imwrite( "PDI_" + str(count) + ".jpg", imagem )
 		count = count + 1
 		print('Salvando')
 
