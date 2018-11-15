@@ -1,2 +1,2 @@
 # PDI
-Repositório decidado ao aprendizado de Processo Digital de Imagem e para disciplina PDI.
+Repositório decidado ao aprendizado de Processamento Digital de Imagem e para disciplina PDI.
