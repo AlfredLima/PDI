@@ -68,7 +68,7 @@ def rotationImg(img, tetha):
 
     for i in range(sizeH):
         for j in range(sizeV):
-            new_image[i][j] = np.matmul(matrix_rotation, img[i][j])
+            new_image[i][j] = img.dot(matrix_rotation) #np.matmul(matrix_rotation, img[i][j])
 
     max_x, min_x = np.max(new_image), np.min(new_image)
     
