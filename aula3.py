@@ -35,60 +35,67 @@ def diffAbsImg(img1, img2):
                 new_image[i][j][k] = abs(img1[i][j][k]-img2[i][j][k])
     return new_image
 
-def stretchImg(img):
-    sizeH, sizeV, dim = img1.shape
+def stretchImg(img, cx, cy):
+    sizeH, sizeV, dim = img.shape
     new_image = np.zeros([sizeH, sizeV, dim],dtype=np.uint8)
-    img1 = img1.astype(np.float64) 
-    img2 = img2.astype(np.float64)
+
+    m = np.matrix([ [cx, 0, 0], [0, cy, 0], [0, 0, 1] ])
+
     for i in range(sizeH):
         for j in range(sizeV):
-            for k in range(dim):
-                new_image[i][j][k] = abs(img1[i][j][k]-img2[i][j][k])
+            point = np.matrix([i,j,1], dtype=np.uint64)
+            new_point = list(map( np.uint64, point.dot(m) ))[0]
+            x, y = position(new_point.item(0), new_point.item(1), sizeH, sizeV)
+            new_image[x][y] = img[i][j]
+
     return new_image
 
-def norma(x, min_x, max_x):
-    return (x-min_x)/(max_x-min_x)
+def position(x,y, sizeH, sizeV):
+    return x%sizeH , y%sizeV
 
-def getRMat((cx, cy), angle, scale):
-    a = scale*m.cos(angle*np.pi/180)
-    b = scale*(m.sin(angle*np.pi/180))
-    u = (1-a)*cx-b*cy
-    v = b*cx+(1-a)*cy
-    return np.array([[a,b,u], [-b,a,v]]) 
-
+def rotationPoint(point, m, img, new_img, sizeH, sizeV):
+    a = list(point.dot(m))[0]
+    x, y = position(a.item(0), a.item(1), sizeH, sizeV)
+    new_img[x][y] = img[i][j]
+    print(new_img[x][y])
 
 def rotationImg(img, tetha):
-    sizeH, sizeV, dim = img1.shape
-    new_image = np.zeros([sizeH, sizeV, dim],dtype=np.float64)
-    img = img.astype(np.float64) 
+    sizeH, sizeV, dim = img.shape
+    new_image = np.zeros([sizeH, sizeV, dim],dtype=np.uint8)
     
     co = np.cos( tetha * np.pi/180 )
     si = np.sin( tetha * np.pi/180 )
-    matrix_rotation = np.matrix( [ [co, -si, 0] , [si, co, 0], [0, 0, 1] ] )
-
-    for i in range(sizeH):
-        for j in range(sizeV):
-            new_image[i][j] = img.dot(matrix_rotation) #np.matmul(matrix_rotation, img[i][j])
-
-    max_x, min_x = np.max(new_image), np.min(new_image)
+    m = np.matrix([ [co, -si, 0], [si, co, 0], [0, 0, 1] ])
     
     for i in range(sizeH):
         for j in range(sizeV):
-            new_image[i][j] = list(map(lambda x: x(new_image[i][j], min_x, max_x), [norma]))[0]
+            point = np.matrix([i,j,0], dtype=np.float64)
+            new_point = list( map(np.int32, point.dot(m)) )[0]
+            x, y = new_point.item(0), new_point.item(1)
+            
+            try:
 
-    new_image = (255 * new_image).astype(np.uint8)
-    #print(new_image)
+                if x < 0  or y < 0:
+                    continue
+                new_image[x][y] = img[i][j]
+                
+            except Exception as e:
+                pass    
+    
     return new_image
 
 
 img1 = cv2.imread('/home/alfredo/Workspace/PDI/AT2/lena.png')
 img2 = cv2.imread('/home/alfredo/Workspace/PDI/AT2/baboon.png')
 
-cv2.imshow('img1',img1)
-cv2.waitKey(0)
+show = 1
 
-cv2.imshow('img2',img2)
-cv2.waitKey(0)
+if show :
+    cv2.imshow('img1',img1)
+    cv2.waitKey(0)
+
+    #cv2.imshow('img2',img2)
+    #cv2.waitKey(0)
 
 sizeh1, sizev1, dim1 = img1.shape
 sizeh2, sizev2, dim2 = img2.shape
@@ -104,8 +111,11 @@ if sizeh1 == sizeh2 and sizev1 == sizev2 and dim1 == dim2:
     #img5 = diffAbsImg(img1,img2)
     #cv2.imshow('img5',img5)
     #cv2.waitKey(0)
-    img6 = rotationImg(img1,90)
-    cv2.imshow('img6',img6)
+    #img6 = rotationImg(img1,90)
+    #cv2.imshow('img6',img6)
+    #cv2.waitKey(0)
+    img7 = stretchImg(img1,2,2)
+    cv2.imshow('img7',img7)
     cv2.waitKey(0)
 else:
     print('Diferente')
