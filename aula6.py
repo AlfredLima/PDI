@@ -88,3 +88,23 @@ while 0xFF & cv2.waitKey(1) != ord('q'):
 	pass
 
 cv2.destroyAllWindows()
+
+img = cv2.imread('rectangle.jpg',0)
+
+planes = [np.zeros(img.shape, dtype=np.float64), np.zeros(img.shape, dtype=np.float64)]
+planes[0][:] = np.float64(img[:])
+
+img2 = cv2.merge(planes)
+img2 = cv2.dft(img2)
+
+planes = cv2.split(img2)
+
+cv2.normalize(planes[0],planes[0], 1,0, cv2.NORM_MINMAX)
+cv2.normalize(planes[1],planes[1], 1,0, cv2.NORM_MINMAX)
+
+while  0xFF & cv2.waitKey(1) != ord('q'):
+	cv2.imshow('Original', img)
+	cv2.imshow('Plane 0 - Real', planes[0])
+	cv2.imshow('Plane 1 - Imaginary', planes[1])
+
+cv2.destroyAllWindows()
