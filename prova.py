@@ -22,37 +22,54 @@ img2 = pid.readColorImage('img/abc.png', show=True)
 img_rgb = pid.bgr2rgb(img)
 img2_rgb = pid.bgr2rgb(img2)
 
-#pid.plotRGBMCY(img)
+#%%
+import cv2
+import numpy as np
 
-r = [1, 0, 0]
-g = [0, 1, 0]
-b = [0, 0, 1]
-c = [0, 1, 1]
-m = [1, 0, 1]
-y = [1, 1, 0]
+#%%
+baboonRGB = cv2.imread("img/baboon.png", cv2.COLOR_BGR2RGB)
+baboonABC = cv2.imread("img/abc.png")
 
-img_g = np.uint8(g * img)
-img_r = np.uint8(r * img)
-img_b = np.uint8(b * img)
-img_c = np.uint8(c * img)
-img_m = np.uint8(m * img)
-img_y = np.uint8(y * img)
+r1 = baboonRGB[0][0][0]
+b1 = baboonRGB[0][0][1]
+g1 = baboonRGB[0][0][2]
 
-img2_g = np.uint8(g * img2)
-img2_r = np.uint8(r * img2)
-img2_b = np.uint8(b * img2)
-img2_c = np.uint8(c * img2)
-img2_m = np.uint8(m * img2)
-img2_y = np.uint8(y * img2)
+r2 = baboonRGB[0][1][0]
+g2 = baboonRGB[0][1][1]
+b2 = baboonRGB[0][1][2]
 
+r3 = baboonRGB[0][2][0]
+g3 = baboonRGB[0][2][1]
+b3 = baboonRGB[0][2][2]
 
-c1, c2, c3 = pid.splitChanels(img)
+a1 = baboonABC[0][0][0]
+ab1 = baboonABC[0][0][1]
+c1 = baboonABC[0][0][2]
 
-colors = [c1, c2, c3]
+a2 = baboonABC[0][1][0]
+ab2 = baboonABC[0][1][1]
+c2 = baboonABC[0][1][2]
 
-for i in colors:
-    for j in colors:
-        for k in colors:
-            img3 = pid.mergeChanels(i, j, k)
-            imgs = [pid.bgr2rgb(img), pid.bgr2rgb(img2), pid.bgr2rgb(img3)]
-            pid.showImages(imgs)
+a3 = baboonABC[0][2][0]
+ab3 = baboonABC[0][2][1]
+c3 = baboonABC[0][2][2]
+
+l = np.array([[r1, g1, b1], [r2, g2, b2], [r3, g3, b3]])
+s1 = np.array([a1, a2, a3])
+s2 = np.array([ab1, ab2, ab3])
+s3 = np.array([c1, c2, c3])
+
+x1 = np.linalg.solve(l, s1)
+x2 = np.linalg.solve(l, s2)
+x3 = np.linalg.solve(l, s3)
+
+M = np.matrix([x1, x2, x3])
+
+abc = np.zeros((512, 512, 3), dtype=np.float64)
+
+for i in range(512):
+    for j in range(512):
+        abc[i][j] = np.dot(M, baboonRGB[i][j])/255
+
+cv2.imshow("img", abc)
+cv2.waitKey(0)
